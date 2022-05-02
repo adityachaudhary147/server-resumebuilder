@@ -703,6 +703,37 @@ app.post("/api/addexperienced", auth, async (req, res) => {
 
 });
 
+// Get experience Details 
+
+app.get("/api/getexperienced", auth, async (req, res) => {
+    try {
+        // const {token}=req.auth;
+        // const {title,user,resumeid}=req.body;\
+        const Resid = req.body.Resid;
+        const params = [Resid];
+        var sql2 = 'SELECT * FROM ExperienceD WHERE Resid=?;';
+        db.all(sql2, params, function (err, rows) {
+            console.log(err, rows);
+            if (err) {
+                return res.status(400);
+            }
+            else {
+                console.log(rows);
+                return res.status(200).send(rows);
+            }
+        })
+        // console.log(req.user);
+        console.log("addd  personal skills called calleds");
+        // console.log(req);
+
+
+    }
+    catch (err) {
+        console.log(err);
+    }
+
+});
+
 //remove education degree entry from backend server database
 
 app.post("/api/removeEducationEntry", auth, async (req, res) => {
@@ -763,36 +794,47 @@ app.post("/api/removeExp", auth, async (req, res) => {
 
 });
 
-
-// Get experience Details 
-
-app.get("/api/getexperienced", auth, async (req, res) => {
+// remove experience entry okayy
+app.post("/api/removeall", auth, async (req, res) => {
     try {
+
         // const {token}=req.auth;
         // const {title,user,resumeid}=req.body;\
+    //    const Id=req.body.Id;
         const Resid = req.body.Resid;
+        console.log(req.body);
         const params = [Resid];
-        var sql2 = 'SELECT * FROM ExperienceD WHERE Resid=?;';
-        db.all(sql2, params, function (err, rows) {
-            console.log(err, rows);
-            if (err) {
-                return res.status(400);
-            }
-            else {
-                console.log(rows);
-                return res.status(200).send(rows);
-            }
-        })
+        console.log("inside the apis");
+        var sql2 = 'Delete From ExperienceD  Where (Resid=? );';
+        console.log(sql2);
+        const ans1=await db.query(sql2,params);
+        sql2 = 'Delete From Resume  Where (Id=? );';
+        console.log(sql2);
+        const ans2=await db.query(sql2,params);
+        sql2 = 'Delete From PersonalD  Where (Resid=? );';
+        console.log(sql2);
+        
+        const ans3=await db.query(sql2,params);
+        sql2 = 'Delete From SkillsD  Where (Resid=? );';
+        console.log(sql2);
+        const ans4=await db.query(sql2,params);
+        sql2 = 'Delete From EducationD  Where (Resid=? );';
+        console.log(sql2);
+        const ans5= await db.query(sql2,params);
+        // return res.status(400);
         // console.log(req.user);
-        console.log("addd  personal skills called calleds");
+        console.log(ans1,ans2,ans3,ans4,ans4,ans5);
+        console.log("Removed the Data from backend table");
         // console.log(req);
-
-
+        return res.status(200).send("Success fully removed the data from backend");
     }
     catch (err) {
         console.log(err);
     }
 
 });
+
+
+
 
 app.listen(port, () => console.log(`API listening on port ${port}!`));
