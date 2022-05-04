@@ -314,11 +314,20 @@ app.post("/api/addresume",auth,(req,res)=>{
         const userid=req.user.user_id;
         var sql='INSERT INTO Resume (Name,Userid) VALUES(?,?);';
         var params=[Name,userid];
+        var rowid;
         db.run(sql,params,(error)=>{
+
+            rowid=this.lastID;
+            
             console.log(error);
             console.log(this);
+            return res.status(200).send(String(rowid));
+
+
+           
         })
-        res.status(200).send("success");
+
+        // res.status(200).send("success");
 
         
 
@@ -388,7 +397,9 @@ async function gettableinfousingResid(table,resid)
       return await db.query(sql,[resid]);
 }
 // getting all the data of the resume with resume id 
-
+async function getResumeName(resid){
+    return await db.query("select Name from resume where Id=?",[resid]);
+}
 app.get("/api/loadresume",auth,(req,res)=>{
     try{
         // const userid=req.user.user_id;
@@ -412,8 +423,9 @@ app.get("/api/loadresume",auth,(req,res)=>{
             const exp=await gettableinfousingResid("ExperienceD",resid);
             const personal=await gettableinfousingResid("PersonalD",resid);
             const skills=await gettableinfousingResid("SkillsD",resid);
+            const resumeName= await getResumeName(resid);
             
-            res.status(200).send({edu,exp,personal,skills});
+            res.status(200).send({edu,exp,personal,skills,resumeName});
         })();
 
         
