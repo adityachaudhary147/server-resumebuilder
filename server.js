@@ -890,6 +890,39 @@ async function callexpasunc(exp,Resid){
 
     return ;
 }
+async function callskillasunc(skill,Resid){
+    
+    skill.map(val=>{
+
+        const value = val.Name;
+        const resid = Resid;
+        var sql2 = 'INSERT  INTO   SkillsD (Name,Resid)  VALUES (?,?);';
+        const ans3=dbquery(sql2,[value,Resid]);
+       
+        
+
+    })
+
+
+    return ;
+}
+async function callpersonalasync(personal,Resid){
+    personal.map(val=>{
+        const params = [val.Name, val.Profession, val.Email, val.Weburl, val.PhoneNo, Resid];
+        var sql3 = 'INSERT  INTO   PersonalD (Name,Profession,Email,Weburl,PhoneNo,Resid)  VALUES (?,?,?,?,?,?);';  
+        const ans4=dbquery(sql3,params);
+        console.log(ans4);
+
+        
+       
+        
+
+    })
+
+
+
+    return ;
+}
 // createNew ENTries
 app.post("/api/createNewEntries", auth, async (req, res) => {
     try {
@@ -910,6 +943,13 @@ app.post("/api/createNewEntries", auth, async (req, res) => {
 
         const exp=data.exp;
         const hi2 = await callexpasunc(exp,Resid);
+        const personal=data.personal;
+
+        const hi3 = await callpersonalasync(personal,Resid);
+
+        const skill=data.skills;
+        const hi4= await callskillasunc(skill,Resid);
+        console.log(hi4);
        
         return res.status(200).send("Success fully inserted the new entries in the resume");
     }
