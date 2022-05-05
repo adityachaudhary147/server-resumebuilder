@@ -309,18 +309,20 @@ app.post("/api/addresume",auth,(req,res)=>{
         {
             res.status(400).send("Name Required");
             return;
-    }
+        }
 
         const userid=req.user.user_id;
         var sql='INSERT INTO Resume (Name,Userid) VALUES(?,?);';
         var params=[Name,userid];
         var rowid;
-        db.run(sql,params,(error)=>{
-
+        db.run(sql,params,function (error,rows){
+            console.log(error, rows,"rows and errors",this);
             rowid=this.lastID;
             
             console.log(error);
             console.log(this);
+            console.log("this should be printeedd");
+            console.log("tjos is the eow id",rowid);
             return res.status(200).send(String(rowid));
 
 
@@ -695,7 +697,7 @@ app.post("/api/addexperienced", auth, async (req, res) => {
         var sql2 = 'INSERT  INTO   ExperienceD (Company,Jobtitle,Duration,Desc1,Desc2,Resid)  VALUES (?,?,?,?,?,?);';
         console.log(sql2);
         db.run(sql2, params, function (err, rows) {
-            console.log(err, rows);
+            
             if (err) {
                 return res.status(400);
             }
@@ -845,6 +847,78 @@ app.post("/api/removeall", auth, async (req, res) => {
     }
 
 });
+
+async function dbquery(sql,params)
+{
+    return await db.query(sql,params);
+}
+async function calleduasync(edu,Resid){
+    console.log(edu);   
+
+    edu.map(val=>{
+        
+        console.log(val,"pushing exp for the ",Resid);
+
+        var sql2 = 'INSERT  INTO   EducationD (UniName,Course,StartYear,EndYear,Location,Resid)  VALUES (?,?,?,?,?,?);';
+        var params=[val.UniName,val.Course,val.StartYear,val.EndYear,val.Location,Resid];
+        // const ans=await db.query(sql2,params);
+        const ans=dbquery(sql2,params);
+
+        console.log(ans);
+
+        
+    })
+    return ;
+}
+
+async function callexpasunc(exp,Resid){
+    console.log(exp);
+    exp.map(val=>{
+
+        console.log(val,"pushing exp for the ",Resid);
+
+        const params = [val.Company, val.Jobtitle, val.Duration, val.Desc1, val.Desc2, Resid];
+        var sql2 = 'INSERT  INTO   ExperienceD (Company,Jobtitle,Duration,Desc1,Desc2,Resid)  VALUES (?,?,?,?,?,?);';
+        
+        // const ans2=await db.query(sql2,params);
+        const ans2=dbquery(sql2,params);
+        console.log(ans2);
+        
+
+    })
+
+
+    return ;
+}
+// createNew ENTries
+app.post("/api/createNewEntries", auth, async (req, res) => {
+    try {
+
+        // const {token}=req.auth;
+        // const {title,user,resumeid}=req.body;\
+    //    const Id=req.body.Id;
+        const Resid = req.body.Resid;
+        const data= JSON.parse(req.body.data);
+        console.log("resid",Resid);
+        console.log(req.body,"reqbdy");
+        console.log(data,"dayata");
+
+        const edu=data.edu;
+
+        const hi=await calleduasync(edu,Resid);
+       
+
+        const exp=data.exp;
+        const hi2 = await callexpasunc(exp,Resid);
+       
+        return res.status(200).send("Success fully inserted the new entries in the resume");
+    }
+    catch (err) {
+        console.log(err);
+    }
+
+});
+
 
 
 
